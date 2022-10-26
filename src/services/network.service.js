@@ -30,7 +30,7 @@ class Network {
 		} catch (error) {
 			return {
 				success: false,
-				message: error.response.data,
+				message: error.response ? error.response.data : error.message,
 				debugMessage: error.code
 			};
 		}
