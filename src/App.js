@@ -1,12 +1,15 @@
+import CssBaseline from '@mui/material/CssBaseline';
 import React from 'react';
 import './App.scss';
 import Navigation from './infrastructure/navigation';
+import Theme from './infrastructure/theme';
 
 function App() {
 	return (
-		<div>
+		<Theme>
+			<CssBaseline />
 			<Navigation />
-		</div>
+		</Theme>
 	);
 }
 

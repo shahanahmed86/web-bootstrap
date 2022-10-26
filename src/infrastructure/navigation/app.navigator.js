@@ -1,13 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DashboardPage from '../../pages/dashboard/dashboard.page';
 
 function AppNavigator() {
 	return (
-		<Router basename='/dashboard'>
+		<Router>
 			<Routes>
-				<Route path='/' element={<DashboardPage />} />
-				<Route path='*' element={<Navigate to='/dashboard' />} />
+				<Route path='/*' element={<DashboardPage />} />
 			</Routes>
 		</Router>
 	);

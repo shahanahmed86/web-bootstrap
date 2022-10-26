@@ -1,37 +1,17 @@
 import axios from 'axios';
 import token from '../utils/token.util';
+import { BASE_URL } from '../utils/config.util';
 
 class Network {
-	baseUrl = 'https://dummyjson.com';
+	baseUrl = BASE_URL;
 	/**
-	 * @param {boolean} includeToken
+	 * @param {{ method: string, data?: object | FormData }} options
 	 */
-	includeHeaders(includeToken = true) {
-		const headers = new Headers();
-		headers.append('content-type', 'application/json');
+	includeHeaders(options, includeToken = true) {
+		const headers = {};
+		if (includeToken) headers['Authorization'] = `Bearer ${token.getToken}`;
 
-		if (includeToken) headers.append('Authorization', `Bearer ${token.getToken}`);
-
-		return headers;
-	}
-
-	/**
-	 * @param {{ method: string, headers: Headers, data?: object }} options
-	 */
-	includeBody(options) {
-		switch (options.method.toLowerCase()) {
-			case 'post':
-			case 'put': {
-				options.data = JSON.stringify(options.data);
-				break;
-			}
-			default: {
-				if ('data' in options) delete options.data;
-				break;
-			}
-		}
-
-		return options;
+		options.headers = headers;
 	}
 
 	/**
@@ -40,8 +20,7 @@ class Network {
 	 */
 	async networkHandler(url, options, includeToken = true) {
 		try {
-			options.headers = this.includeHeaders(includeToken);
-			this.includeBody(options);
+			this.includeHeaders(options, includeToken);
 
 			const result = await axios(url, options);
 			return {
@@ -51,10 +30,15 @@ class Network {
 		} catch (error) {
 			return {
 				success: false,
-				data: error.message,
+				message: error.response.data,
 				debugMessage: error.code
 			};
 		}
+	}
+
+	resolveImageUrl (avatar) {
+		if (!avatar) return avatar;
+		return `${this.baseUrl}/api/common/image?filename=${avatar}`;
 	}
 }
 

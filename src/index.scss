@@ -1,14 +1,14 @@
-*,
-*::after,
-*::before {
-	box-sizing: border-box;
-}
+// roboto font
+@import '~@fontsource/roboto/300.css';
+@import '~@fontsource/roboto/400.css';
+@import '~@fontsource/roboto/500.css';
+@import '~@fontsource/roboto/700.css';
 
-html,
-body,
-#root {
-	height: 100%;
-	overflow-y: hidden;
-	padding: 0px;
-	margin: 0px;
-}
+// oswald
+@import '~@fontsource/oswald/300.css';
+@import '~@fontsource/oswald/400.css';
+@import '~@fontsource/oswald/500.css';
+@import '~@fontsource/oswald/700.css';
+
+// react-toastify
+@import '~react-toastify/dist/ReactToastify.css';

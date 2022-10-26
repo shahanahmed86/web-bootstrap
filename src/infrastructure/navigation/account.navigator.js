@@ -1,15 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from '../../pages/login/login.page';
-import RegisterPage from '../../pages/register/register.page';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import HomePage from '../../pages/home/home.page';
 
 function AuthNavigator() {
 	return (
 		<Router>
 			<Routes>
-				<Route path='/' element={<LoginPage />} />
-				<Route path='/register' element={<RegisterPage />} />
-				<Route path='*' element={<Navigate to='/' />} />
+				<Route path='/*' element={<HomePage />} />
 			</Routes>
 		</Router>
 	);

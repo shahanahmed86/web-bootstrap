@@ -6,12 +6,13 @@ import TextField from '@mui/material/TextField';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-export default function CTextField({ disabled, error, label, value, handleChange, variant, type }) {
+function CTextField({ disabled, error, label, value, handleChange, variant, type }) {
 	const [showPassword, setShowPassword] = useState(false);
 
 	const handleClickShowPassword = () => setShowPassword((prev) => !prev);
 	return (
 		<TextField
+			fullWidth
 			disabled={disabled}
 			type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
 			error={!!error}
@@ -56,3 +57,5 @@ CTextField.defaultProps = {
 	variant: 'standard',
 	type: 'text'
 };
+
+export default CTextField;

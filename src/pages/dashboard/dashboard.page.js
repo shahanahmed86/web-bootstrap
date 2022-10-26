@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { Fragment } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import DashboardComponent from './components/dashboard.component';
+import HeaderComponent from './components/header.component';
 
 function DashboardPage() {
 	return (
-		<div>
-			<h3>Dashboard Page</h3>
-		</div>
+		<Fragment>
+			<HeaderComponent />
+
+			<Routes>
+				<Route exact path='/dashboard' element={<DashboardComponent />} />
+				<Route path='*' element={<Navigate to='/dashboard' />} />
+			</Routes>
+		</Fragment>
 	);
 }
 

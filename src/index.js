@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
 import { store } from './store';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -12,6 +13,7 @@ const root = createRoot(container);
 root.render(
 	<Provider store={store}>
 		<App />
+		<ToastContainer />
 	</Provider>
 );
 
