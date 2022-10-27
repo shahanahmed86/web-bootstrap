@@ -22,7 +22,8 @@ function Navigation() {
       .finally(() => setLoading(false));
   }, [dispatch]);
 
-  if (loading) return <p>loading...</p>;
+  if (loading) return null;
+
   if (auth.isAuthenticated) return <AppNavigator />;
   return <AccountNavigator />;
 }

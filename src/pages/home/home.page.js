@@ -1,12 +1,14 @@
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import React, { useMemo } from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import Spacer from '../../components/spacer/spacer.component';
-import LoginComponent from './components/login.component';
-import SignUpComponent from './components/signup.component';
+import LoaderComponent from '../../components/loader/loader.component';
 import styles from './home.module.scss';
-import LeftComponent from './components/left.component';
+
+const Spacer = lazy(() => import('../../components/spacer/spacer.component'));
+const LeftComponent = lazy(() => import('./components/left.component'));
+const LoginComponent = lazy(() => import('./components/login.component'));
+const SignUpComponent = lazy(() => import('./components/signup.component'));
 
 function SignUpPage() {
   const location = useLocation();
@@ -17,7 +19,9 @@ function SignUpPage() {
   );
   return (
     <Grid container className={styles.container}>
-      <LeftComponent />
+      <Suspense fallback={<LoaderComponent />}>
+        <LeftComponent />
+      </Suspense>
       <Grid
         item
         xs={12}
@@ -29,19 +33,21 @@ function SignUpPage() {
         className={styles['right-box']}
       >
         <div className={styles['routes-wrapper']}>
-          <Typography
-            variant='h4'
-            color='secondary'
-            display='block'
-            align='center'
-          >{`${title} Form`}</Typography>
-          <Spacer position='marginBottom' />
+          <Suspense fallback={<LoaderComponent />}>
+            <Typography
+              variant='h4'
+              color='secondary'
+              display='block'
+              align='center'
+            >{`${title} Form`}</Typography>
+            <Spacer position='marginBottom' />
 
-          <Routes>
-            <Route exact path='/' element={<LoginComponent />} />
-            <Route exact path='/signup' element={<SignUpComponent />} />
-            <Route path='*' element={<Navigate to='/' />} />
-          </Routes>
+            <Routes>
+              <Route exact path='/' element={<LoginComponent />} />
+              <Route exact path='/signup' element={<SignUpComponent />} />
+              <Route path='*' element={<Navigate to='/' />} />
+            </Routes>
+          </Suspense>
         </div>
       </Grid>
     </Grid>
