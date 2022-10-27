@@ -7,70 +7,76 @@ import { authService } from '../../../services';
 import { authActions } from '../../../store/auth';
 import { toast } from 'react-toastify';
 import Spacer from '../../../components/spacer/spacer.component';
+import { useFormik } from 'formik';
+import { loginInitialValues, loginValidationSchema } from './model/login.model';
 
-const initialForm = { username: 'shahanahmed', password: '123Abc456' };
 function LoginComponent() {
-	const dispatch = useDispatch();
-	const [loading, setLoading] = useState(false);
-	const [form, setForm] = useState({ ...initialForm });
-	const handleChange = (name) => {
-		return ({ target: { value } }) => {
-			setForm((prev) => ({
-				...prev,
-				[name]: value
-			}));
-		};
-	};
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		setLoading(true);
-		authService
-			.login({ ...form })
-			.then((res) => {
-				if (!res.success) return toast.error(res.message);
+  const dispatch = useDispatch();
 
-				dispatch(authActions.onAuth(res.data.payload));
-			})
-			.finally(() => setLoading(false));
-	};
-	return (
-		<Fragment>
-			<form onSubmit={handleSubmit}>
-				<CTextField
-					disabled={loading}
-					type='text'
-					handleChange={handleChange('username')}
-					label='User'
-					value={form.username}
-				/>
-				<Spacer position='marginBottom' />
+  const [loading, setLoading] = useState(false);
 
-				<CTextField
-					disabled={loading}
-					type='password'
-					handleChange={handleChange('password')}
-					label='Password'
-					value={form.password}
-				/>
-				<Spacer position='marginBottom' />
-				<Button disabled={loading} type='submit' variant='contained'>
-					Sign In
-				</Button>
-			</form>
-			<p>
-				Don't have an account?
-				<Button
-					to='/signup'
-					disabled={loading}
-					LinkComponent={Link}
-					variant='text'
-					color='secondary'
-				>
-					Sign Up
-				</Button>
-			</p>
-		</Fragment>
-	);
+  const handleSubmit = (values) => {
+    setLoading(true);
+    authService
+      .login(values)
+      .then((res) => {
+        if (!res.success) return toast.error(res.message);
+
+        dispatch(authActions.onAuth(res.data.payload));
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const formik = useFormik({
+    initialValues: loginInitialValues,
+    validationSchema: loginValidationSchema,
+    onSubmit: handleSubmit,
+  });
+
+  return (
+    <Fragment>
+      <form onSubmit={formik.handleSubmit}>
+        <CTextField
+          error={
+            formik.touched.username && formik.errors.username ? formik.errors.username : undefined
+          }
+          disabled={loading}
+          type='text'
+          handleChange={formik.handleChange('username')}
+          label='User'
+          value={formik.values.username}
+        />
+        <Spacer position='marginBottom' />
+
+        <CTextField
+          error={
+            formik.touched.password && formik.errors.password ? formik.errors.password : undefined
+          }
+          disabled={loading}
+          type='password'
+          handleChange={formik.handleChange('password')}
+          label='Password'
+          value={formik.values.password}
+        />
+        <Spacer position='marginBottom' />
+        <Button disabled={loading} type='submit' variant='contained'>
+          Sign In
+        </Button>
+      </form>
+      <p>
+        Don't have an account?
+        <Button
+          to='/signup'
+          disabled={loading}
+          LinkComponent={Link}
+          variant='text'
+          color='secondary'
+        >
+          Sign Up
+        </Button>
+      </p>
+    </Fragment>
+  );
 }
 
 export default LoginComponent;

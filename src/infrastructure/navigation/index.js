@@ -6,25 +6,25 @@ import AccountNavigator from './account.navigator';
 import AppNavigator from './app.navigator';
 
 function Navigation() {
-	const auth = useSelector((store) => store.auth);
-	const dispatch = useDispatch();
+  const auth = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
 
-	const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		authService
-			.loggedIn()
-			.then((res) => {
-				if (!res.success) return console.log(res.message);
+  useEffect(() => {
+    authService
+      .loggedIn()
+      .then((res) => {
+        if (!res.success) return console.log(res.message);
 
-				dispatch(authActions.onAuth(res.data));
-			})
-			.finally(() => setLoading(false));
-	}, [dispatch]);
+        dispatch(authActions.onAuth(res.data));
+      })
+      .finally(() => setLoading(false));
+  }, [dispatch]);
 
-	if (loading) return <p>loading...</p>;
-	if (auth.isAuthenticated) return <AppNavigator />;
-	return <AccountNavigator />;
+  if (loading) return <p>loading...</p>;
+  if (auth.isAuthenticated) return <AppNavigator />;
+  return <AccountNavigator />;
 }
 
 export default Navigation;

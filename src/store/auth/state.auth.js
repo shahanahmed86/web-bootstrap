@@ -1,4 +1,4 @@
 export const initialState = {
-	isAuthenticated: false,
-	user: null
+  isAuthenticated: false,
+  user: null,
 };

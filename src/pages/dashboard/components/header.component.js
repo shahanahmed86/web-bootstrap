@@ -10,32 +10,29 @@ import { authActions } from '../../../store/auth';
 import token from '../../../utils/token.util';
 
 function Header() {
-	const { user } = useSelector((store) => store.auth);
-	const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
 
-	const onLogout = (e) => {
-		e.preventDefault();
+  const onLogout = (e) => {
+    e.preventDefault();
 
-		token.removeToken();
-		dispatch(authActions.onLogout());
-	};
+    token.removeToken();
+    dispatch(authActions.onLogout());
+  };
 
-	return (
-		<AppBar position='static' color='transparent' elevation={1}>
-			<Toolbar>
-				<Avatar src={user.avatar} alt={user.username} />
-				<Typography
-					variant='h6'
-					component='div'
-					sx={{ flexGrow: 1, marginLeft: 2 }}
-					children={user.fullName || user.username}
-				></Typography>
-				<IconButton size='large' color='secondary' onClick={onLogout}>
-					<LogoutRounded />
-				</IconButton>
-			</Toolbar>
-		</AppBar>
-	);
+  return (
+    <AppBar position='static' color='transparent' elevation={1}>
+      <Toolbar>
+        <Avatar src={user.avatar} alt={user.username} />
+        <Typography variant='h6' component='div' sx={{ flexGrow: 1, marginLeft: 2 }}>
+          {user.fullName || user.username}
+        </Typography>
+        <IconButton size='large' color='secondary' onClick={onLogout}>
+          <LogoutRounded />
+        </IconButton>
+      </Toolbar>
+    </AppBar>
+  );
 }
 
 export default Header;
