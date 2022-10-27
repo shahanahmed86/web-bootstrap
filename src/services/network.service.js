@@ -1,6 +1,6 @@
 import axios from 'axios';
-import token from '../utils/token.util';
 import { BASE_URL } from '../utils/config.util';
+import token from '../utils/token.util';
 
 class Network {
   baseUrl = BASE_URL;
@@ -36,6 +36,11 @@ class Network {
     }
   }
 
+  /**
+   * resolveImageUrl
+   * @param {string} avatar
+   * @returns string
+   */
   resolveImageUrl(avatar) {
     if (!avatar) return avatar;
     return `${this.baseUrl}/api/common/image?filename=${avatar}`;
