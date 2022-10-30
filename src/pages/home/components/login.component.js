@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import { useFormik } from 'formik';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -8,24 +8,39 @@ import CTextField from '../../../components/form/textfield/textfield.component';
 import Spacer from '../../../components/spacer/spacer.component';
 import { authService } from '../../../services';
 import { authActions } from '../../../store/auth';
+import { getController } from '../../../utils/helper.util';
 import { loginInitialValues, loginValidationSchema } from './model/login.model';
+
+/**
+ * controller variable
+ * @type {AbortController=}
+ */
+let controller = null;
 
 function LoginComponent() {
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (values) => {
-    setLoading(true);
-    authService
-      .login(values)
-      .then((res) => {
-        if (!res.success) return toast.error(res.message);
+  const handleSubmit = useCallback(
+    (values) => {
+      controller = getController(controller);
 
-        dispatch(authActions.onAuth(res.data.payload));
-      })
-      .finally(() => setLoading(false));
-  };
+      setLoading(true);
+      authService
+        .login(values, controller.signal)
+        .then((res) => {
+          if (!res.success) {
+            if (res.canShowToaster) toast.error(res.message);
+            return;
+          }
+
+          dispatch(authActions.onAuth(res.data.payload));
+        })
+        .finally(() => setLoading(false));
+    },
+    [dispatch]
+  );
 
   const formik = useFormik({
     initialValues: loginInitialValues,
@@ -33,6 +48,12 @@ function LoginComponent() {
     onSubmit: handleSubmit,
   });
 
+  // abort on component unmounts
+  useEffect(() => {
+    return () => {
+      if (controller) controller.abort();
+    };
+  }, []);
   return (
     <Fragment>
       <form onSubmit={formik.handleSubmit}>
@@ -65,13 +86,7 @@ function LoginComponent() {
       </form>
       <p>
         Don't have an account?
-        <Button
-          to='/signup'
-          disabled={loading}
-          LinkComponent={Link}
-          variant='text'
-          color='secondary'
-        >
+        <Button to='/signup' LinkComponent={Link} variant='text' color='secondary'>
           Sign Up
         </Button>
       </p>

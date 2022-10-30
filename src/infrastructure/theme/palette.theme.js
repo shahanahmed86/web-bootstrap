@@ -1,3 +1,6 @@
+/**
+ * @type {import("@mui/material").Palette} palette
+ */
 const palette = {
   primary: {
     light: '#42a5f5',

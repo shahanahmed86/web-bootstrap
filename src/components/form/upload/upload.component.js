@@ -1,28 +1,53 @@
 import Avatar from '@mui/material/Avatar';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { commonService } from '../../../services';
+import { getController } from '../../../utils/helper.util';
 import styles from './upload.module.scss';
+
+/**
+ * controller variable
+ * @type {AbortController=}
+ */
+let controller = null;
 
 function UploadComponent({ setter }) {
   const [file, setFile] = useState('');
 
-  const handleChange = (e) => {
-    const uploadedFile = e.target.files[0];
+  const handleChange = useCallback(
+    /**
+     * @param {Event} e - event
+     */
+    (e) => {
+      controller = getController(controller);
 
-    const formData = new FormData();
-    formData.append('uploadedFile', uploadedFile, uploadedFile.name);
+      const uploadedFile = e.target.files[0];
 
-    commonService.upload(formData).then((res) => {
-      if (!res.success) return toast.error(res.message);
+      const formData = new FormData();
+      formData.append('uploadedFile', uploadedFile, uploadedFile.name);
 
-      const { path } = res.data;
+      commonService.upload(formData, controller.signal).then((res) => {
+        if (!res.success) {
+          if (res.canShowToaster) toast.error(res.message);
+          return;
+        }
 
-      setFile(commonService.resolveImageUrl(path));
-      setter(path);
-    });
-  };
+        const { path } = res.data;
+
+        setFile(commonService.resolveImageUrl(path));
+        setter(path);
+      });
+    },
+    [setter]
+  );
+
+  // abort on component unmounts
+  useEffect(() => {
+    return () => {
+      if (controller) controller.abort();
+    };
+  }, []);
   return (
     <div className={styles['container']}>
       <input style={{ display: 'none' }} id='upload' type='file' onChange={handleChange} />

@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import { useFormik } from 'formik';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -10,8 +10,14 @@ import UploadComponent from '../../../components/form/upload/upload.component';
 import Spacer from '../../../components/spacer/spacer.component';
 import { authService, commonService } from '../../../services';
 import { authActions } from '../../../store/auth';
-import { excludeNullsAndOmit } from '../../../utils/helper.util';
+import { excludeNullsAndOmit, getController } from '../../../utils/helper.util';
 import { signupInitialValues, signupValidationSchema } from './model/signup.model';
+
+/**
+ * controller variable
+ * @type {AbortController=}
+ */
+let controller = null;
 
 function SignUpComponent() {
   const dispatch = useDispatch();
@@ -19,19 +25,27 @@ function SignUpComponent() {
   const [loading, setLoading] = useState(false);
   const [genderOptions, setGenderOptions] = useState([]);
 
-  const handleSubmit = (values) => {
-    const payload = excludeNullsAndOmit(values, 'confirmPassword');
+  const handleSubmit = useCallback(
+    (values) => {
+      controller = getController(controller);
 
-    setLoading(true);
-    authService
-      .signup(payload)
-      .then((res) => {
-        if (!res.success) return toast.error(res.message);
+      const payload = excludeNullsAndOmit(values, 'confirmPassword');
 
-        dispatch(authActions.onAuth(res.data.payload));
-      })
-      .finally(() => setLoading(false));
-  };
+      setLoading(true);
+      authService
+        .signup(payload, controller.signal)
+        .then((res) => {
+          if (!res.success) {
+            if (res.canShowToaster) toast.error(res.message);
+            return;
+          }
+
+          dispatch(authActions.onAuth(res.data.payload));
+        })
+        .finally(() => setLoading(false));
+    },
+    [dispatch]
+  );
 
   const formik = useFormik({
     initialValues: signupInitialValues,
@@ -39,10 +53,14 @@ function SignUpComponent() {
     onSubmit: handleSubmit,
   });
 
+  const handleUpload = (value) => formik.setFieldValue('avatar', value);
+
   useEffect(() => {
-    commonService.getGenderOptions().then((res) => {
+    controller = getController(controller);
+
+    commonService.getGenderOptions(controller.signal).then((res) => {
       if (!res.success) {
-        toast.error(res.message);
+        if (res.canShowToaster) toast.error(res.message);
         return;
       }
 
@@ -50,9 +68,15 @@ function SignUpComponent() {
     });
   }, []);
 
+  // abort on component unmounts
+  useEffect(() => {
+    return () => {
+      if (controller) controller.abort();
+    };
+  }, []);
   return (
     <Fragment>
-      <UploadComponent setter={(value) => formik.setFieldValue('avatar', value)} />
+      <UploadComponent setter={handleUpload} />
       <Spacer position='marginBottom' />
 
       <form onSubmit={formik.handleSubmit}>
@@ -139,7 +163,7 @@ function SignUpComponent() {
       </form>
       <p>
         Already have an account?
-        <Button to='/' disabled={loading} LinkComponent={Link} variant='text' color='secondary'>
+        <Button to='/' LinkComponent={Link} variant='text' color='secondary'>
           Sign In
         </Button>
       </p>

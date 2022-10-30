@@ -2,10 +2,15 @@ import axios from 'axios';
 import { BASE_URL } from '../utils/config.util';
 import token from '../utils/token.util';
 
+import '../type-defs';
+
 class Network {
   baseUrl = BASE_URL;
+
   /**
-   * @param {{ method: string, data?: object | FormData }} options
+   * @param {NetworkOptions} options - {@link NetworkOptions} network options
+   * @param {boolean=} includeToken - includeToken
+   * @returns {void} - void
    */
   includeHeaders(options, includeToken = true) {
     const headers = {};
@@ -16,7 +21,9 @@ class Network {
 
   /**
    * @param {string} url
-   * @param {{ method: string, data?: object }} options
+   * @param {NetworkOptions} options - {@link NetworkOptions} network options
+   * @param {boolean=} includeToken - includeToken
+   * @returns {Promise<Result>} result - {@link Result} network results
    */
   async networkHandler(url, options, includeToken = true) {
     try {
@@ -28,11 +35,16 @@ class Network {
         data: result.data,
       };
     } catch (error) {
-      return {
+      const result = {
         success: false,
         message: error.response ? error.response.data : error.message,
         debugMessage: error.code,
+        canShowToaster: true,
       };
+
+      if (error.code.includes('ERR_CANCELED')) result.canShowToaster = false;
+
+      return result;
     }
   }
 

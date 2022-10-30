@@ -8,14 +8,16 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '../../../store/auth';
 import token from '../../../utils/token.util';
+import '../../../type-defs';
 
 function Header() {
+  /**
+   * @type {AuthState} redux store {@link AuthState}
+   */
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
 
-  const onLogout = (e) => {
-    e.preventDefault();
-
+  const onLogout = () => {
     token.removeToken();
     dispatch(authActions.onLogout());
   };

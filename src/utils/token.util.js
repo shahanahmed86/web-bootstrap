@@ -6,7 +6,7 @@ class Token {
   }
   /**
    * @param {string} value
-   * */
+   */
   set setToken(value) {
     localStorage.setItem(LABEL, value);
   }

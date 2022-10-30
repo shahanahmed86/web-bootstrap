@@ -32,3 +32,15 @@ export const excludeNullsAndOmit = (obj, keys) => {
   const temp = excludeNulls(obj);
   return omit(temp, Array.isArray(keys) ? keys : [keys]);
 };
+
+/**
+ * getController
+ * @param {AbortController} _controller
+ * @returns {AbortController} controller
+ */
+export const getController = (_controller) => {
+  if (_controller) _controller.abort();
+  const controller = new AbortController('shahan');
+
+  return controller;
+};

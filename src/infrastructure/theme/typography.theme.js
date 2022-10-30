@@ -1,17 +1,12 @@
+/**
+ * @type {import("@mui/material/styles/createTypography").TypographyOptions} typography
+ */
 export const typography = {
-  fontFamily: [
-    'Roboto',
-    'Oswald',
-    '"Helvetica Neue"',
-    '"Segoe UI Emoji"',
-    'BlinkMacSystemFont',
-    '-apple-system',
-    '"Segoe UI"',
-    'Arial',
-    'sans-serif',
-    '"Apple Color Emoji"',
-    '"Segoe UI Symbol"',
-  ].join(','),
+  fontFamily: ['Oswald', 'Lato', 'Roboto', 'Arial', 'sans-serif'].join(','),
+  fontWeightLight: 300,
+  fontWeightRegular: 400,
+  fontWeightMedium: 500,
+  fontWeightBold: 700,
 };
 
 export default typography;
