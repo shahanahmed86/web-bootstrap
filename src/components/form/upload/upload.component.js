@@ -1,33 +1,25 @@
 import Avatar from '@mui/material/Avatar';
 import PropTypes from 'prop-types';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
+import useSignal from '../../../hooks/signal.hook';
 import { commonService } from '../../../services';
-import { getController } from '../../../utils/helper.util';
 import styles from './upload.module.scss';
 
-/**
- * controller variable
- * @type {AbortController=}
- */
-let controller = null;
-
 function UploadComponent({ setter }) {
+  const signal = useSignal();
   const [file, setFile] = useState('');
 
   const handleChange = useCallback(
-    /**
-     * @param {Event} e - event
-     */
     (e) => {
-      controller = getController(controller);
+      if (!signal) return;
 
       const uploadedFile = e.target.files[0];
 
       const formData = new FormData();
       formData.append('uploadedFile', uploadedFile, uploadedFile.name);
 
-      commonService.upload(formData, controller.signal).then((res) => {
+      commonService.upload(formData, signal).then((res) => {
         if (!res.success) {
           if (res.canShowToaster) toast.error(res.message);
           return;
@@ -39,15 +31,8 @@ function UploadComponent({ setter }) {
         setter(path);
       });
     },
-    [setter]
+    [setter, signal]
   );
-
-  // abort on component unmounts
-  useEffect(() => {
-    return () => {
-      if (controller) controller.abort();
-    };
-  }, []);
   return (
     <div className={styles['container']}>
       <input style={{ display: 'none' }} id='upload' type='file' onChange={handleChange} />

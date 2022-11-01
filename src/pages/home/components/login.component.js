@@ -1,34 +1,29 @@
 import Button from '@mui/material/Button';
 import { useFormik } from 'formik';
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import CTextField from '../../../components/form/textfield/textfield.component';
 import Spacer from '../../../components/spacer/spacer.component';
+import useSignal from '../../../hooks/signal.hook';
 import { authService } from '../../../services';
 import { authActions } from '../../../store/auth';
-import { getController } from '../../../utils/helper.util';
 import { loginInitialValues, loginValidationSchema } from './model/login.model';
 
-/**
- * controller variable
- * @type {AbortController=}
- */
-let controller = null;
-
 function LoginComponent() {
+  const signal = useSignal();
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = useCallback(
     (values) => {
-      controller = getController(controller);
+      if (!signal) return;
 
       setLoading(true);
       authService
-        .login(values, controller.signal)
+        .login(values, signal)
         .then((res) => {
           if (!res.success) {
             if (res.canShowToaster) toast.error(res.message);
@@ -39,7 +34,7 @@ function LoginComponent() {
         })
         .finally(() => setLoading(false));
     },
-    [dispatch]
+    [dispatch, signal]
   );
 
   const formik = useFormik({
@@ -47,13 +42,6 @@ function LoginComponent() {
     validationSchema: loginValidationSchema,
     onSubmit: handleSubmit,
   });
-
-  // abort on component unmounts
-  useEffect(() => {
-    return () => {
-      if (controller) controller.abort();
-    };
-  }, []);
   return (
     <Fragment>
       <form onSubmit={formik.handleSubmit}>

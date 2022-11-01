@@ -8,18 +8,14 @@ import CSelect from '../../../components/form/select/select.component';
 import CTextField from '../../../components/form/textfield/textfield.component';
 import UploadComponent from '../../../components/form/upload/upload.component';
 import Spacer from '../../../components/spacer/spacer.component';
+import useSignal from '../../../hooks/signal.hook';
 import { authService, commonService } from '../../../services';
 import { authActions } from '../../../store/auth';
-import { excludeNullsAndOmit, getController } from '../../../utils/helper.util';
+import { excludeNullsAndOmit } from '../../../utils/helper.util';
 import { signupInitialValues, signupValidationSchema } from './model/signup.model';
 
-/**
- * controller variable
- * @type {AbortController=}
- */
-let controller = null;
-
 function SignUpComponent() {
+  const signal = useSignal();
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
@@ -27,13 +23,13 @@ function SignUpComponent() {
 
   const handleSubmit = useCallback(
     (values) => {
-      controller = getController(controller);
+      if (!signal) return;
 
       const payload = excludeNullsAndOmit(values, 'confirmPassword');
 
       setLoading(true);
       authService
-        .signup(payload, controller.signal)
+        .signup(payload, signal)
         .then((res) => {
           if (!res.success) {
             if (res.canShowToaster) toast.error(res.message);
@@ -44,7 +40,7 @@ function SignUpComponent() {
         })
         .finally(() => setLoading(false));
     },
-    [dispatch]
+    [dispatch, signal]
   );
 
   const formik = useFormik({
@@ -56,9 +52,9 @@ function SignUpComponent() {
   const handleUpload = (value) => formik.setFieldValue('avatar', value);
 
   useEffect(() => {
-    controller = getController(controller);
+    if (!signal) return;
 
-    commonService.getGenderOptions(controller.signal).then((res) => {
+    commonService.getGenderOptions(signal).then((res) => {
       if (!res.success) {
         if (res.canShowToaster) toast.error(res.message);
         return;
@@ -66,14 +62,7 @@ function SignUpComponent() {
 
       setGenderOptions(res.data);
     });
-  }, []);
-
-  // abort on component unmounts
-  useEffect(() => {
-    return () => {
-      if (controller) controller.abort();
-    };
-  }, []);
+  }, [signal]);
   return (
     <Fragment>
       <UploadComponent setter={handleUpload} />

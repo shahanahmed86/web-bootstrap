@@ -1,32 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
+import useSignal from '../../../hooks/signal.hook';
 import { authService, commonService } from '../../../services';
-import { getController } from '../../../utils/helper.util';
-
-/**
- * controller variable
- * @type {AbortController=}
- */
-let controller = null;
 
 function DashboardComponent() {
-  const checkAuth = () => {
-    controller = getController(controller);
+  const signal = useSignal();
 
-    authService.loggedIn(controller.signal);
-  };
+  const checkAuth = useCallback(() => {
+    if (!signal) return;
 
-  const getGenders = () => {
-    controller = getController(controller);
+    authService.loggedIn(signal);
+  }, [signal]);
 
-    commonService.getGenderOptions(controller.signal);
-  };
+  const getGenders = useCallback(() => {
+    if (!signal) return;
 
-  // abort on component unmounts
-  useEffect(() => {
-    return () => {
-      if (controller) controller.abort();
-    };
-  }, []);
+    commonService.getGenderOptions(signal);
+  }, [signal]);
   return (
     <div>
       <h3>DashboardComponent</h3>
