@@ -1,21 +1,21 @@
-import React, { useCallback } from 'react';
-import useSignal from '../../../hooks/signal.hook';
+import React, { useCallback, useEffect } from 'react';
 import { authService, commonService } from '../../../services';
 
 function DashboardComponent() {
-  const signal = useSignal();
-
   const checkAuth = useCallback(() => {
-    if (!signal) return;
-
-    authService.loggedIn(signal);
-  }, [signal]);
+    authService.loggedIn();
+  }, []);
 
   const getGenders = useCallback(() => {
-    if (!signal) return;
+    commonService.getGenderOptions();
+  }, []);
 
-    commonService.getGenderOptions(signal);
-  }, [signal]);
+  useEffect(() => {
+    return () => {
+      commonService.getGenderOptionsController.abort();
+      authService.loggedInController.abort();
+    };
+  }, []);
   return (
     <div>
       <h3>DashboardComponent</h3>

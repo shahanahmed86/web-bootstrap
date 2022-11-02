@@ -12,6 +12,5 @@
  * API's options
  * @typedef {object} NetworkOptions
  * @property {"GET"|"PUT"|"POST"|"DELETE"} method - method enums
- * @property {Function} signal - signal
  * @property {object|FormData} data - body
  */

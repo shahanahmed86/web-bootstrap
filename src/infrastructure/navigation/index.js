@@ -1,35 +1,36 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import useSignal from '../../hooks/signal.hook';
 import { authService } from '../../services';
 import { authActions } from '../../store/auth';
 import AccountNavigator from './account.navigator';
 import AppNavigator from './app.navigator';
 
 function Navigation() {
-  const signal = useSignal();
-
   const auth = useSelector((store) => store.auth);
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(true);
 
   const checkAuth = useCallback(() => {
-    if (!signal) return;
-
     authService
-      .loggedIn(signal)
+      .loggedIn()
       .then((res) => {
         if (!res.success) return console.log(res.message);
 
         dispatch(authActions.onAuth(res.data));
       })
       .finally(() => setLoading(false));
-  }, [dispatch, signal]);
+  }, [dispatch]);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    return () => {
+      authService.loggedInController.abort();
+    };
+  }, []);
 
   if (loading) return null;
 

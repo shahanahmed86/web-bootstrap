@@ -57,6 +57,18 @@ class Network {
     if (!avatar) return avatar;
     return `${this.baseUrl}/api/common/image?filename=${avatar}`;
   }
+
+  /**
+   * getController
+   * @param {AbortController} _controller
+   * @returns {AbortController} controller
+   */
+  getController(_controller) {
+    if (!_controller.signal.aborted) _controller.abort();
+    const controller = new AbortController();
+
+    return controller;
+  }
 }
 
 export default Network;

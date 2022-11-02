@@ -6,12 +6,15 @@ import '../type-defs';
 const USER = '/api/user/auth';
 
 class AuthService extends NetworkService {
+  loginController = new AbortController();
   /**
    * login
    * @param {UserObject} data User object {@link UserObject}
-   * @param {Function} signal - signal
    */
-  async login(data, signal) {
+  async login(data) {
+    this.loginController = this.getController(this.loginController);
+    const { signal } = this.loginController;
+
     const url = `${this.baseUrl}${USER}`;
     const result = await this.networkHandler(url, { method: 'POST', data, signal }, false);
     if (result.success) token.setToken = result.data.token;
@@ -24,12 +27,15 @@ class AuthService extends NetworkService {
     return result;
   }
 
+  signupController = new AbortController();
   /**
    * signup
    * @param {UserObject} data User object {@link UserObject}
-   * @param {Function} signal - signal
    */
-  async signup(data, signal) {
+  async signup(data) {
+    this.signupController = this.getController(this.signupController);
+    const { signal } = this.signupController;
+
     const url = `${this.baseUrl}${USER}/signup`;
     const result = await this.networkHandler(url, { method: 'POST', data, signal }, false);
     if (result.success) token.setToken = result.data.token;
@@ -41,11 +47,12 @@ class AuthService extends NetworkService {
 
     return result;
   }
-  /**
-   * loggedIn
-   * @param {Function} signal - signal
-   */
-  async loggedIn(signal) {
+
+  loggedInController = new AbortController();
+  async loggedIn() {
+    this.loggedInController = this.getController(this.loggedInController);
+    const { signal } = this.loggedInController;
+
     const url = `${this.baseUrl}${USER}`;
     const result = await this.networkHandler(url, { method: 'GET', signal });
 

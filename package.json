@@ -25,7 +25,6 @@
     "react-scripts": "5.0.1",
     "react-svg": "^15.1.10",
     "react-toastify": "^9.0.8",
-    "rxjs": "^7.5.7",
     "web-vitals": "^2.1.4",
     "yup": "^0.32.11"
   },

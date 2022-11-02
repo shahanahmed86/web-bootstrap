@@ -1,25 +1,21 @@
 import Avatar from '@mui/material/Avatar';
 import PropTypes from 'prop-types';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import useSignal from '../../../hooks/signal.hook';
 import { commonService } from '../../../services';
 import styles from './upload.module.scss';
 
 function UploadComponent({ setter }) {
-  const signal = useSignal();
   const [file, setFile] = useState('');
 
   const handleChange = useCallback(
     (e) => {
-      if (!signal) return;
-
       const uploadedFile = e.target.files[0];
 
       const formData = new FormData();
       formData.append('uploadedFile', uploadedFile, uploadedFile.name);
 
-      commonService.upload(formData, signal).then((res) => {
+      commonService.upload(formData).then((res) => {
         if (!res.success) {
           if (res.canShowToaster) toast.error(res.message);
           return;
@@ -31,8 +27,14 @@ function UploadComponent({ setter }) {
         setter(path);
       });
     },
-    [setter, signal]
+    [setter]
   );
+
+  useEffect(() => {
+    return () => {
+      commonService.uploadController.abort();
+    };
+  }, []);
   return (
     <div className={styles['container']}>
       <input style={{ display: 'none' }} id='upload' type='file' onChange={handleChange} />

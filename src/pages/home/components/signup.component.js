@@ -8,14 +8,12 @@ import CSelect from '../../../components/form/select/select.component';
 import CTextField from '../../../components/form/textfield/textfield.component';
 import UploadComponent from '../../../components/form/upload/upload.component';
 import Spacer from '../../../components/spacer/spacer.component';
-import useSignal from '../../../hooks/signal.hook';
 import { authService, commonService } from '../../../services';
 import { authActions } from '../../../store/auth';
 import { excludeNullsAndOmit } from '../../../utils/helper.util';
 import { signupInitialValues, signupValidationSchema } from './model/signup.model';
 
 function SignUpComponent() {
-  const signal = useSignal();
   const dispatch = useDispatch();
 
   const [loading, setLoading] = useState(false);
@@ -23,13 +21,11 @@ function SignUpComponent() {
 
   const handleSubmit = useCallback(
     (values) => {
-      if (!signal) return;
-
       const payload = excludeNullsAndOmit(values, 'confirmPassword');
 
       setLoading(true);
       authService
-        .signup(payload, signal)
+        .signup(payload)
         .then((res) => {
           if (!res.success) {
             if (res.canShowToaster) toast.error(res.message);
@@ -40,7 +36,7 @@ function SignUpComponent() {
         })
         .finally(() => setLoading(false));
     },
-    [dispatch, signal]
+    [dispatch]
   );
 
   const formik = useFormik({
@@ -52,9 +48,7 @@ function SignUpComponent() {
   const handleUpload = (value) => formik.setFieldValue('avatar', value);
 
   useEffect(() => {
-    if (!signal) return;
-
-    commonService.getGenderOptions(signal).then((res) => {
+    commonService.getGenderOptions().then((res) => {
       if (!res.success) {
         if (res.canShowToaster) toast.error(res.message);
         return;
@@ -62,7 +56,12 @@ function SignUpComponent() {
 
       setGenderOptions(res.data);
     });
-  }, [signal]);
+
+    return () => {
+      authService.signupController.abort();
+      commonService.getGenderOptionsController.abort();
+    };
+  }, []);
   return (
     <Fragment>
       <UploadComponent setter={handleUpload} />
